@@ -13,6 +13,7 @@ import com.avaje.ebean.Ebean;
 
 import dto.BlockUpdateDTO;
 import dto.CreateFriendConnectionDTO;
+import dto.GetUsersCanReceiveUpdateDTO;
 import dto.SubscribeToUpdateDTO;
 import models.FriendConnection;
 import models.SubscriptionStatus;
@@ -23,6 +24,7 @@ import repositories.IUserRepository;
 import repositories.IUserUpdateSubscriptionRepository;
 import responses.CommonFriendsResponse;
 import responses.SuccessResponse;
+import responses.UserCanReceiveUpdateResponse;
 import responses.UserFriendResponse;
 import specification.CommonFriendSpecification;
 import specification.UserSpecification;
@@ -75,7 +77,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public UserFriendResponse getUserFriends(String userEmail) {
 		User user = findUserByEmail(userEmail);
-		List<String> friendsList = user.getFriends().stream().map(e -> e.getFriend().getEmail())
+		List<String> friendsList = user.getFriendsConnection().stream().map(e -> e.getFriend().getEmail())
 				.collect(Collectors.toList());
 
 		UserFriendResponse resp = new UserFriendResponse();
@@ -141,7 +143,46 @@ public class UserServiceImpl implements IUserService {
 
 		return updateSubscription;
 	}
+
+	@Override
+	public UserCanReceiveUpdateResponse getUsersCanReceiveUpdateFrom(GetUsersCanReceiveUpdateDTO dto) {
+		User user = findUserByEmail(dto.getSender());
+		
+		UserCanReceiveUpdateResponse resp = new UserCanReceiveUpdateResponse();
+		resp.setRecipients(findEligibleUsersToReceiveUpdate(user, dto.getText()));
+		
+		return resp;
+	}
 	
+	public Set<String> findEligibleUsersToReceiveUpdate(User user, String message) {
+		Set<String> myHatersEmail  = user
+				.getMyHaters()
+				.stream()
+				.map(e -> e.getRequestor().getEmail())
+				.collect(Collectors.toSet());
+		
+		List <String> myFriends= user.
+				getFriendsConnection()
+				.stream()
+				.filter(e -> !myHatersEmail.contains(e.getFriend().getEmail()))
+				.map(e -> e.getFriend().getEmail())
+				.collect(Collectors.toList());
+	
+		Set<String> myFans  = user
+				.getMyFans()
+				.stream()
+				.filter(e -> !myHatersEmail.contains(e.getRequestor().getEmail()))
+				.map(e -> e.getRequestor().getEmail())
+				.collect(Collectors.toSet());
+		
+		Set<String> eligibleUserToReceiveUpdates = new HashSet<>();
+		eligibleUserToReceiveUpdates.addAll(myFriends);
+		eligibleUserToReceiveUpdates.addAll(myFans);
+		eligibleUserToReceiveUpdates.addAll(findEmailAddresses(message));
+		
+		return eligibleUserToReceiveUpdates;
+	}
+
 	public Set<String> findEmailAddresses(String input) {
 		Pattern p = Pattern.compile("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b", Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(input);
@@ -149,7 +190,8 @@ public class UserServiceImpl implements IUserService {
 		while (matcher.find()) {
 			emails.add(matcher.group());
 		}
-		
+
 		return emails;
 	}
+
 }

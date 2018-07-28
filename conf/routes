@@ -8,7 +8,7 @@ GET     /                           controllers.HomeController.index
 POST    /users/friends             		controllers.UserController.createFriendConnection
 POST    /users/friends/list        		controllers.UserController.getUserFriends
 POST    /users/friends/common      		controllers.UserController.getCommonFriends
-
+POST    /users/subscribe/update/list    controllers.UserController.getUsersCanReceiveUpdate
 
 PUT    /users/subscription/subscribe    controllers.UserController.subscribeToUpdate
 PUT    /users/subscription/block   		controllers.UserController.blockUpdate

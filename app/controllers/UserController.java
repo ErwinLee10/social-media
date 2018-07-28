@@ -8,6 +8,7 @@ import dto.BlockUpdateDTO;
 import dto.CreateFriendConnectionDTO;
 import dto.FindCommonFriendsDTO;
 import dto.GetUserFriendDTO;
+import dto.GetUsersCanReceiveUpdateDTO;
 import dto.SubscribeToUpdateDTO;
 import play.data.Form;
 import play.data.FormFactory;
@@ -60,5 +61,11 @@ public class UserController extends Controller{
 		
 		return ok(Json.toJson(userService.blockUpdate(dto)));
 		
+	}
+	
+	public Result getUsersCanReceiveUpdate() {
+		Form<GetUsersCanReceiveUpdateDTO> form = formFactory.form(GetUsersCanReceiveUpdateDTO.class).bindFromRequest();
+		GetUsersCanReceiveUpdateDTO dto = form.get();
+		return ok(Json.toJson(userService.getUsersCanReceiveUpdateFrom(dto)));
 	}
 }

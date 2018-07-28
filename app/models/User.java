@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.avaje.ebean.annotation.Where;
+
 @Entity
 public class User extends BaseModel {
 
@@ -17,7 +19,15 @@ public class User extends BaseModel {
 	private String email;
 
 	@OneToMany(mappedBy = "user")
-	private List<FriendConnection> friends;
+	private List<FriendConnection> friendsConnection;
+
+	@OneToMany(mappedBy = "target")
+	@Where(clause = "subscriptionStatus=1")
+	private List<UserUpdateSubscription> myFans;
+
+	@OneToMany(mappedBy = "target")
+	@Where(clause = "subscriptionStatus=2")
+	private List<UserUpdateSubscription> myHaters;
 
 	public String getEmail() {
 		return email;
@@ -27,11 +37,28 @@ public class User extends BaseModel {
 		this.email = email;
 	}
 
-	public List<FriendConnection> getFriends() {
-		return friends;
+	public List<FriendConnection> getFriendsConnection() {
+		return friendsConnection;
 	}
 
-	public void setFriends(List<FriendConnection> friends) {
-		this.friends = friends;
+	public void setFriendsConnection(List<FriendConnection> friends) {
+		this.friendsConnection = friends;
 	}
+
+	public List<UserUpdateSubscription> getMyFans() {
+		return myFans;
+	}
+
+	public void setMyFans(List<UserUpdateSubscription> myFans) {
+		this.myFans = myFans;
+	}
+
+	public List<UserUpdateSubscription> getMyHaters() {
+		return myHaters;
+	}
+
+	public void setMyHaters(List<UserUpdateSubscription> myHaters) {
+		this.myHaters = myHaters;
+	}
+
 }

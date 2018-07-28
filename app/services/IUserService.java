@@ -6,9 +6,11 @@ import com.google.inject.ImplementedBy;
 
 import dto.BlockUpdateDTO;
 import dto.CreateFriendConnectionDTO;
+import dto.GetUsersCanReceiveUpdateDTO;
 import dto.SubscribeToUpdateDTO;
 import responses.CommonFriendsResponse;
 import responses.SuccessResponse;
+import responses.UserCanReceiveUpdateResponse;
 import responses.UserFriendResponse;
 
 @ImplementedBy(UserServiceImpl.class)
@@ -23,4 +25,6 @@ public interface IUserService {
 	public SuccessResponse subscribeToUpdate(SubscribeToUpdateDTO dto);
 	
 	public SuccessResponse blockUpdate(BlockUpdateDTO dto);
+	
+	public UserCanReceiveUpdateResponse getUsersCanReceiveUpdateFrom(GetUsersCanReceiveUpdateDTO dto);
 }
