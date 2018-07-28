@@ -7,10 +7,10 @@ import com.avaje.ebean.Model.Find;
 import models.FriendConnection;
 import specifications.ISpecification;
 
-public class FriendRepository extends BaseRepository<FriendConnection, ISpecification<FriendConnection>>
-		implements IFriendRepository {
+public class FriendConnectionRepository extends BaseRepository<FriendConnection, ISpecification<FriendConnection>>
+		implements IFriendConnectionRepository {
 
-	public FriendRepository() {
+	public FriendConnectionRepository() {
 		super(new Find<Long, FriendConnection>() {
 		});
 	}

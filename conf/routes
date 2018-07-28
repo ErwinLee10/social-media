@@ -5,7 +5,7 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
-POST    /users/friends             		controllers.UserController.createFriendConnection
+PUT     /users/friends             		controllers.UserController.createFriendConnection
 POST    /users/friends/list        		controllers.UserController.getUserFriends
 POST    /users/friends/common      		controllers.UserController.getCommonFriends
 POST    /users/subscribe/update/list    controllers.UserController.getUsersCanReceiveUpdate

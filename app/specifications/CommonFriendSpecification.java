@@ -24,9 +24,9 @@ public class CommonFriendSpecification implements ISpecification<User> {
 	@Override
 	public ExpressionList<User> toExpressionList(Find<Long, User> find) {
 		String query = String.format(
-				"select u.id, u.email from friend f join user u on f.friend_id = u.id "
+				"select u.id, u.email from friend_connection f join user u on f.friend_id = u.id "
 						+ "where f.user_id = (select id from user where email = '%s')"
-						+ " and f.friend_id in (select friend_id from friend where user_id = (select id from user where email = '%s'))",
+						+ " and f.friend_id in (select friend_id from friend_connection where user_id = (select id from user where email = '%s'))",
 				emailList.get(0), emailList.get(1));
 
 		RawSql rawSql = RawSqlBuilder.parse(query).columnMapping("u.id", "id").columnMapping("u.email", "email")

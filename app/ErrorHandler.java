@@ -1,10 +1,11 @@
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.apache.commons.beanutils.BeanUtils;
+
+import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedInsertJavaTime.Base;
 
 import exceptions.BaseException;
 import play.http.HttpErrorHandler;
@@ -25,7 +26,15 @@ public class ErrorHandler implements HttpErrorHandler{
 
 	@Override
 	public CompletionStage<Result> onServerError(RequestHeader arg0, Throwable exception) {
-		BaseException baseException = (BaseException) exception;
+		BaseException baseException = null;
+		if(exception instanceof BaseException) {
+			baseException = (BaseException) exception;
+		}else {
+			return CompletableFuture.completedFuture(
+	                Results.internalServerError()
+	        );
+		}
+		
 		List<ExceptionResponse> errors = new ArrayList<>();
 		ExceptionResponse exceptionResponse = new  ExceptionResponse();
 		try {
@@ -41,6 +50,11 @@ public class ErrorHandler implements HttpErrorHandler{
 		if(baseException.getHttpErrorCode() == 404) {
 			return CompletableFuture.completedFuture(
 	                Results.notFound(Json.toJson(resp))
+	        );
+		}
+		if(baseException.getHttpErrorCode() == 400) {
+			return CompletableFuture.completedFuture(
+	                Results.badRequest(Json.toJson(resp))
 	        );
 		}else {
 			return CompletableFuture.completedFuture(

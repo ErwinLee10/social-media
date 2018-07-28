@@ -15,11 +15,14 @@ import dtos.BlockUpdateDTO;
 import dtos.CreateFriendConnectionDTO;
 import dtos.GetUsersCanReceiveUpdateDTO;
 import dtos.SubscribeToUpdateDTO;
+import exceptions.NotAllowToAddFriendDueToBlockUpdateException;
+import exceptions.RequestPayloadException;
+import exceptions.UserNotFoundException;
 import models.FriendConnection;
 import models.SubscriptionStatus;
 import models.User;
 import models.UserUpdateSubscription;
-import repositories.IFriendRepository;
+import repositories.IFriendConnectionRepository;
 import repositories.IUserRepository;
 import repositories.IUserUpdateSubscriptionRepository;
 import responses.CommonFriendsResponse;
@@ -27,6 +30,7 @@ import responses.SuccessResponse;
 import responses.UserCanReceiveUpdateResponse;
 import responses.UserFriendResponse;
 import specifications.CommonFriendSpecification;
+import specifications.FriendConnectionSpecification;
 import specifications.UserSpecification;
 import specifications.UserUpdateSubscriptionSpecification;
 
@@ -36,7 +40,7 @@ public class UserServiceImpl implements IUserService {
 	IUserRepository userRepository;
 
 	@Inject
-	IFriendRepository friendRepository;
+	IFriendConnectionRepository friendRepository;
 
 	@Inject
 	IUserUpdateSubscriptionRepository userUpdateSubscriptionRepository;
@@ -46,32 +50,59 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public SuccessResponse createFriendConnection(CreateFriendConnectionDTO dto) {
 		if (dto.getFriends().size() != CREATE_FRIEND_SUPPORTED_SIZE) {
-			// TODO throw exception
+			RequestPayloadException exception = new RequestPayloadException();
+			exception.setMoreInfo("friends length must be 2");
+			throw exception;
 		}
 
-		// TODO check throw user not found exception
 		User firstUser = findUserByEmail(dto.getFriends().get(0));
 		User secondUser = findUserByEmail(dto.getFriends().get(1));
 
 		Ebean.beginTransaction();
 
 		try {
-			FriendConnection firstFriendRelation = new FriendConnection();
-			firstFriendRelation.setUser(firstUser);
-			firstFriendRelation.setFriend(secondUser);
-
-			FriendConnection secondFriendRelation = new FriendConnection();
-			secondFriendRelation.setUser(secondUser);
-			secondFriendRelation.setFriend(firstUser);
-
-			friendRepository.add(firstFriendRelation);
-			friendRepository.add(secondFriendRelation);
+			validateIfExistBlockUpdateBetweenTheseUsers(firstUser, secondUser);
+			createFriendshipIfNotExist(firstUser, secondUser);
+			createFriendshipIfNotExist(secondUser, firstUser);
 			Ebean.commitTransaction();
 		} finally {
 			Ebean.endTransaction();
 		}
 
 		return new SuccessResponse();
+	}
+	
+	private void validateIfExistBlockUpdateBetweenTheseUsers(User firstUser, User secondUser) {
+		UserUpdateSubscription firstUserToSecondUser = getUserUpdateSubscription(
+				firstUser.getEmail(), secondUser.getEmail());
+		UserUpdateSubscription secondUserToFirstUser = getUserUpdateSubscription(
+				secondUser.getEmail(), firstUser.getEmail());
+		
+		if(firstUserToSecondUser != null && 
+				firstUserToSecondUser.getSubscriptionStatus() == SubscriptionStatus.BLOCKED) {
+			throw new NotAllowToAddFriendDueToBlockUpdateException(
+					firstUser.getEmail(), secondUser.getEmail());
+		}
+		
+		if(secondUserToFirstUser != null && 
+				secondUserToFirstUser.getSubscriptionStatus() == SubscriptionStatus.BLOCKED) {
+			throw new NotAllowToAddFriendDueToBlockUpdateException(
+					secondUser.getEmail(), firstUser.getEmail());
+		}
+	}
+
+	private void createFriendshipIfNotExist(User user, User friend) {
+		FriendConnection friendRelation;
+		FriendConnectionSpecification spec = new FriendConnectionSpecification();
+		spec.setFriendEmail(friend.getEmail());
+		spec.setUserEmail(user.getEmail());
+		friendRelation = friendRepository.queryUnique(spec);
+		if (friendRelation == null) {
+			friendRelation = new FriendConnection();
+			friendRelation.setUser(user);
+			friendRelation.setFriend(friend);
+			friendRepository.add(friendRelation);
+		}
 	}
 
 	@Override
@@ -90,7 +121,13 @@ public class UserServiceImpl implements IUserService {
 	private User findUserByEmail(String email) {
 		UserSpecification userSpec = new UserSpecification();
 		userSpec.setEmail(email);
-		return userRepository.queryUnique(userSpec);
+		User user = userRepository.queryUnique(userSpec);
+
+		if (user == null) {
+			throw new UserNotFoundException();
+		}
+
+		return user;
 	}
 
 	@Override
@@ -108,7 +145,8 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public SuccessResponse subscribeToUpdate(SubscribeToUpdateDTO dto) {
-		UserUpdateSubscription updateSubscription = getOrCreateIfNotExist(dto.getRequestor(), dto.getTarget());
+		UserUpdateSubscription updateSubscription = getOrCreateUserUpdateSubscriptionIfNotExist(
+				dto.getRequestor(), dto.getTarget());
 		updateSubscription.setSubscriptionStatus(SubscriptionStatus.SUBSCRIBED);
 
 		userUpdateSubscriptionRepository.add(updateSubscription);
@@ -118,8 +156,8 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public SuccessResponse blockUpdate(BlockUpdateDTO dto) {
-		// TODO check throw user not found exception
-		UserUpdateSubscription updateSubscription = getOrCreateIfNotExist(dto.getRequestor(), dto.getTarget());
+		UserUpdateSubscription updateSubscription = getOrCreateUserUpdateSubscriptionIfNotExist(
+				dto.getRequestor(), dto.getTarget());
 		updateSubscription.setSubscriptionStatus(SubscriptionStatus.BLOCKED);
 
 		userUpdateSubscriptionRepository.add(updateSubscription);
@@ -127,10 +165,14 @@ public class UserServiceImpl implements IUserService {
 		return new SuccessResponse();
 	}
 
-	UserUpdateSubscription getOrCreateIfNotExist(String requestor, String target) {
+	UserUpdateSubscription getUserUpdateSubscription(String requestor, String target) {
+		return userUpdateSubscriptionRepository
+		.queryUnique(new UserUpdateSubscriptionSpecification(requestor, target));
+	}
+	
+	UserUpdateSubscription getOrCreateUserUpdateSubscriptionIfNotExist(String requestor, String target) {
 		UserUpdateSubscription updateSubscription;
-		updateSubscription = userUpdateSubscriptionRepository
-				.queryUnique(new UserUpdateSubscriptionSpecification(requestor, target));
+		updateSubscription = getUserUpdateSubscription(requestor, target);
 
 		if (updateSubscription == null) {
 			User requestorUser = findUserByEmail(requestor);
@@ -147,39 +189,29 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public UserCanReceiveUpdateResponse getUsersCanReceiveUpdateFrom(GetUsersCanReceiveUpdateDTO dto) {
 		User user = findUserByEmail(dto.getSender());
-		
+
 		UserCanReceiveUpdateResponse resp = new UserCanReceiveUpdateResponse();
 		resp.setRecipients(findEligibleUsersToReceiveUpdate(user, dto.getText()));
-		
+
 		return resp;
 	}
-	
+
 	public Set<String> findEligibleUsersToReceiveUpdate(User user, String message) {
-		Set<String> myHatersEmail  = user
-				.getMyHaters()
-				.stream()
-				.map(e -> e.getRequestor().getEmail())
+		Set<String> myHatersEmail = user.getMyHaters().stream().map(e -> e.getRequestor().getEmail())
 				.collect(Collectors.toSet());
-		
-		List <String> myFriends= user.
-				getFriendsConnection()
-				.stream()
-				.filter(e -> !myHatersEmail.contains(e.getFriend().getEmail()))
-				.map(e -> e.getFriend().getEmail())
+
+		List<String> myFriends = user.getFriendsConnection().stream()
+				.filter(e -> !myHatersEmail.contains(e.getFriend().getEmail())).map(e -> e.getFriend().getEmail())
 				.collect(Collectors.toList());
-	
-		Set<String> myFans  = user
-				.getMyFans()
-				.stream()
-				.filter(e -> !myHatersEmail.contains(e.getRequestor().getEmail()))
-				.map(e -> e.getRequestor().getEmail())
-				.collect(Collectors.toSet());
-		
+
+		Set<String> myFans = user.getMyFans().stream().filter(e -> !myHatersEmail.contains(e.getRequestor().getEmail()))
+				.map(e -> e.getRequestor().getEmail()).collect(Collectors.toSet());
+
 		Set<String> eligibleUserToReceiveUpdates = new HashSet<>();
 		eligibleUserToReceiveUpdates.addAll(myFriends);
 		eligibleUserToReceiveUpdates.addAll(myFans);
 		eligibleUserToReceiveUpdates.addAll(findEmailAddresses(message));
-		
+
 		return eligibleUserToReceiveUpdates;
 	}
 
