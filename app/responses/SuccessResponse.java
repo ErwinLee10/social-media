@@ -1,4 +1,4 @@
-package response;
+package responses;
 
 public class SuccessResponse {
 	private boolean success = true;

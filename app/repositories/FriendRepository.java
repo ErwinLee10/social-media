@@ -4,22 +4,24 @@ import java.util.List;
 
 import com.avaje.ebean.Model.Find;
 
-import models.Friend;
+import models.FriendConnection;
 import specification.ISpecification;
 
-public class FriendRepository extends BaseRepository<Friend, ISpecification<Friend>> implements IFriendRepository{
+public class FriendRepository extends BaseRepository<FriendConnection, ISpecification<FriendConnection>>
+		implements IFriendRepository {
 
 	public FriendRepository() {
-		super(new Find<Long,Friend>(){});
+		super(new Find<Long, FriendConnection>() {
+		});
 	}
 
 	@Override
-	public Friend queryUnique(ISpecification<Friend> spec) {
+	public FriendConnection queryUnique(ISpecification<FriendConnection> spec) {
 		return spec.toExpressionList(find).findUnique();
 	}
 
 	@Override
-	public List<Friend> query(ISpecification<Friend> spec) {
+	public List<FriendConnection> query(ISpecification<FriendConnection> spec) {
 		return spec.toExpressionList(find).findList();
 	}
 

@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class FriendId implements Serializable {
+public class FriendConnectionId implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +33,7 @@ public class FriendId implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FriendId other = (FriendId) obj;
+		FriendConnectionId other = (FriendConnectionId) obj;
 		if (friendId != other.friendId)
 			return false;
 		if (userId != other.userId)

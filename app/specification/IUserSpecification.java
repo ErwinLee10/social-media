@@ -1,6 +1,8 @@
 package specification;
 
-public interface  IUserSpecification extends ISpecification {
+import models.User;
+
+public interface  IUserSpecification extends ISpecification<User> {
 	
 
 }

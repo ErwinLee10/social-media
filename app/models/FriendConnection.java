@@ -4,17 +4,15 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 
 
 @Entity
-@Table(name = "friend")
-public class Friend extends BaseModel {
+public class FriendConnection extends BaseModel {
 	private static final long serialVersionUID = 1L;
 
 	@EmbeddedId
-	private FriendId id;
+	private FriendConnectionId id;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -24,11 +22,11 @@ public class Friend extends BaseModel {
 	@JoinColumn(name = "friend_id")
 	private User friend;
 
-	public FriendId getId() {
+	public FriendConnectionId getId() {
 		return id;
 	}
 
-	public void setId(FriendId id) {
+	public void setId(FriendConnectionId id) {
 		this.id = id;
 	}
 
