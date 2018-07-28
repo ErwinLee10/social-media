@@ -5,7 +5,7 @@ import java.util.List;
 import com.avaje.ebean.Model.Find;
 
 import models.FriendConnection;
-import specification.ISpecification;
+import specifications.ISpecification;
 
 public class FriendRepository extends BaseRepository<FriendConnection, ISpecification<FriendConnection>>
 		implements IFriendRepository {

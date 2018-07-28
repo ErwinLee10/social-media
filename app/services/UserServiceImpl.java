@@ -11,10 +11,10 @@ import javax.inject.Inject;
 
 import com.avaje.ebean.Ebean;
 
-import dto.BlockUpdateDTO;
-import dto.CreateFriendConnectionDTO;
-import dto.GetUsersCanReceiveUpdateDTO;
-import dto.SubscribeToUpdateDTO;
+import dtos.BlockUpdateDTO;
+import dtos.CreateFriendConnectionDTO;
+import dtos.GetUsersCanReceiveUpdateDTO;
+import dtos.SubscribeToUpdateDTO;
 import models.FriendConnection;
 import models.SubscriptionStatus;
 import models.User;
@@ -26,9 +26,9 @@ import responses.CommonFriendsResponse;
 import responses.SuccessResponse;
 import responses.UserCanReceiveUpdateResponse;
 import responses.UserFriendResponse;
-import specification.CommonFriendSpecification;
-import specification.UserSpecification;
-import specification.UserUpdateSubscriptionSpecification;
+import specifications.CommonFriendSpecification;
+import specifications.UserSpecification;
+import specifications.UserUpdateSubscriptionSpecification;
 
 public class UserServiceImpl implements IUserService {
 

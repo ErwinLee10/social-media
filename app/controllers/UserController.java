@@ -4,12 +4,13 @@ package controllers;
 
 import javax.inject.Inject;
 
-import dto.BlockUpdateDTO;
-import dto.CreateFriendConnectionDTO;
-import dto.FindCommonFriendsDTO;
-import dto.GetUserFriendDTO;
-import dto.GetUsersCanReceiveUpdateDTO;
-import dto.SubscribeToUpdateDTO;
+import dtos.BlockUpdateDTO;
+import dtos.CreateFriendConnectionDTO;
+import dtos.FindCommonFriendsDTO;
+import dtos.GetUserFriendDTO;
+import dtos.GetUsersCanReceiveUpdateDTO;
+import dtos.SubscribeToUpdateDTO;
+import exceptions.UserNotFoundException;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;

@@ -1,4 +1,4 @@
-package dto;
+package dtos;
 
 public class GetUserFriendDTO {
 

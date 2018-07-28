@@ -3,7 +3,7 @@ package repositories;
 import com.google.inject.ImplementedBy;
 
 import models.UserUpdateSubscription;
-import specification.ISpecification;
+import specifications.ISpecification;
 
 @ImplementedBy(UserUpdateSubscriptionRepository.class)
 public interface IUserUpdateSubscriptionRepository

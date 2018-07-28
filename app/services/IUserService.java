@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.google.inject.ImplementedBy;
 
-import dto.BlockUpdateDTO;
-import dto.CreateFriendConnectionDTO;
-import dto.GetUsersCanReceiveUpdateDTO;
-import dto.SubscribeToUpdateDTO;
+import dtos.BlockUpdateDTO;
+import dtos.CreateFriendConnectionDTO;
+import dtos.GetUsersCanReceiveUpdateDTO;
+import dtos.SubscribeToUpdateDTO;
 import responses.CommonFriendsResponse;
 import responses.SuccessResponse;
 import responses.UserCanReceiveUpdateResponse;

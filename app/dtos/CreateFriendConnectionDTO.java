@@ -1,10 +1,9 @@
-package dto;
+package dtos;
 
 import java.util.List;
 
-public class FindCommonFriendsDTO {
-
-	List<String> friends;
+public class CreateFriendConnectionDTO {
+	private List<String> friends;
 
 	public List<String> getFriends() {
 		return friends;
@@ -13,5 +12,4 @@ public class FindCommonFriendsDTO {
 	public void setFriends(List<String> friends) {
 		this.friends = friends;
 	}
-
 }

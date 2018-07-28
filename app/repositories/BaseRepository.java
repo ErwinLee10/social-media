@@ -5,7 +5,7 @@ import java.util.List;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Find;
 
-import specification.ISpecification;
+import specifications.ISpecification;
 
 import com.avaje.ebean.PagedList;
 

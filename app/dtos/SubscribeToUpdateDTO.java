@@ -1,6 +1,6 @@
-package dto;
+package dtos;
 
-public class BlockUpdateDTO {
+public class SubscribeToUpdateDTO {
 
 	private String requestor;
 	private String target;

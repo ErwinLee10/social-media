@@ -5,7 +5,7 @@ import java.util.List;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.PagedList;
 
-import specification.ISpecification;
+import specifications.ISpecification;
 
 public interface IRepository <T extends Model, V extends ISpecification<T>>{
 

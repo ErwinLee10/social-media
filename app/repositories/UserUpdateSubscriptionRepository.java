@@ -5,7 +5,7 @@ import java.util.List;
 import com.avaje.ebean.Model.Find;
 
 import models.UserUpdateSubscription;
-import specification.ISpecification;
+import specifications.ISpecification;
 
 public class UserUpdateSubscriptionRepository
 		extends BaseRepository<UserUpdateSubscription, ISpecification<UserUpdateSubscription>>

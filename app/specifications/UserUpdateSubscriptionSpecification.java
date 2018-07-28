@@ -1,4 +1,4 @@
-package specification;
+package specifications;
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model.Find;
