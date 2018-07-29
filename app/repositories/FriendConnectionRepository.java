@@ -11,8 +11,7 @@ public class FriendConnectionRepository extends BaseRepository<FriendConnection,
 		implements IFriendConnectionRepository {
 
 	public FriendConnectionRepository() {
-		super(new Find<Long, FriendConnection>() {
-		});
+		super(new Find<Long, FriendConnection>() {});
 	}
 
 	@Override

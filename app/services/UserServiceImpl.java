@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.annotation.Transactional;
 
 import dtos.BlockUpdateDTO;
 import dtos.CreateFriendConnectionDTO;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements IUserService {
 	private static final int CREATE_FRIEND_SUPPORTED_SIZE = 2;
 
 	@Override
+	@Transactional
 	public SuccessResponse createFriendConnection(CreateFriendConnectionDTO dto) {
 		if (dto.getFriends().size() != CREATE_FRIEND_SUPPORTED_SIZE) {
 			RequestPayloadException exception = new RequestPayloadException();
@@ -58,16 +60,9 @@ public class UserServiceImpl implements IUserService {
 		User firstUser = findUserByEmail(dto.getFriends().get(0));
 		User secondUser = findUserByEmail(dto.getFriends().get(1));
 
-		Ebean.beginTransaction();
-
-		try {
-			validateIfExistBlockUpdateBetweenTheseUsers(firstUser, secondUser);
-			createFriendshipIfNotExist(firstUser, secondUser);
-			createFriendshipIfNotExist(secondUser, firstUser);
-			Ebean.commitTransaction();
-		} finally {
-			Ebean.endTransaction();
-		}
+		validateIfExistBlockUpdateBetweenTheseUsers(firstUser, secondUser);
+		createFriendshipIfNotExist(firstUser, secondUser);
+		createFriendshipIfNotExist(secondUser, firstUser);
 
 		return new SuccessResponse();
 	}
@@ -108,7 +103,10 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public UserFriendResponse getUserFriends(String userEmail) {
 		User user = findUserByEmail(userEmail);
-		List<String> friendsList = user.getFriendsConnection().stream().map(e -> e.getFriend().getEmail())
+		List<String> friendsList = user
+				.getFriendsConnection()
+				.stream()
+				.map(e -> e.getFriend().getEmail())
 				.collect(Collectors.toList());
 
 		UserFriendResponse resp = new UserFriendResponse();
@@ -165,7 +163,7 @@ public class UserServiceImpl implements IUserService {
 		return new SuccessResponse();
 	}
 
-	UserUpdateSubscription getUserUpdateSubscription(String requestor, String target) {
+	private UserUpdateSubscription getUserUpdateSubscription(String requestor, String target) {
 		return userUpdateSubscriptionRepository
 		.queryUnique(new UserUpdateSubscriptionSpecification(requestor, target));
 	}
@@ -197,14 +195,22 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	public Set<String> findEligibleUsersToReceiveUpdate(User user, String message) {
-		Set<String> myHatersEmail = user.getMyHaters().stream().map(e -> e.getRequestor().getEmail())
+		Set<String> myHatersEmail = user
+				.getMyHaters()
+				.stream()
+				.map(e -> e.getRequestor().getEmail())
 				.collect(Collectors.toSet());
 
-		List<String> myFriends = user.getFriendsConnection().stream()
-				.filter(e -> !myHatersEmail.contains(e.getFriend().getEmail())).map(e -> e.getFriend().getEmail())
+		List<String> myFriends = user
+				.getFriendsConnection()
+				.stream()
+				.filter(e -> !myHatersEmail.contains(e.getFriend().getEmail()))
+				.map(e -> e.getFriend().getEmail())
 				.collect(Collectors.toList());
 
-		Set<String> myFans = user.getMyFans().stream().filter(e -> !myHatersEmail.contains(e.getRequestor().getEmail()))
+		Set<String> myFans = user.getMyFans()
+				.stream()
+				.filter(e -> !myHatersEmail.contains(e.getRequestor().getEmail()))
 				.map(e -> e.getRequestor().getEmail()).collect(Collectors.toSet());
 
 		Set<String> eligibleUserToReceiveUpdates = new HashSet<>();
