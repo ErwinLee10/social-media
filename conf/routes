@@ -5,13 +5,13 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
-PUT     /users/friends             		controllers.UserController.createFriendConnection
-POST    /users/friends/list        		controllers.UserController.getUserFriends
-POST    /users/friends/common      		controllers.UserController.getCommonFriends
-POST    /users/subscribe/update/list    controllers.UserController.getUsersCanReceiveUpdate
+PUT     /api/v1/users/friends             		controllers.UserController.createFriendConnection
+POST    /api/v1/users/friends/list        		controllers.UserController.getUserFriends
+POST    /api/v1/users/friends/common      		controllers.UserController.getCommonFriends
+POST    /api/v1/users/update/subscription/list   controllers.UserController.getUsersCanReceiveUpdate
 
-PUT    /users/subscription/subscribe    controllers.UserController.subscribeToUpdate
-PUT    /users/subscription/block   		controllers.UserController.blockUpdate
+PUT     /api/v1/users/update/subscription        controllers.UserController.subscribeToUpdate
+PUT     /api/v1/users/update/block   		    controllers.UserController.blockUpdate
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,49 +1,32 @@
-This is your new Play application
-=================================
+##### This project is built using Play Framework version `2.5.10`
 
-This file will be packaged with your application when using `activator dist`.
+### Installation
 
-There are several demonstration files available in this template.
+Install the dependencies (`Mac os guide`)
 
-Controllers
-===========
+```
+$ git clone git@github.com:ErwinLee10/social-media.git
+$ cd social-media
+$ brew install sbt
+```
 
-- HomeController.java:
+to run the code, use this command:
+`sbt clean compile run`
+It will launch a netty server which will bind to a port `9000`
 
-  Shows how to handle simple HTTP requests.
+to run the testing, use this command:
+`sbt test`
 
-- AsyncController.java:
+### Testing environment
+This version of code has been deployed to AWS ec2 machine which can be accessed using this endpoint:
+`http://54.169.175.25:9000`
 
-  Shows how to do asynchronous programming when handling a request.
+the database has been deployed into RDS and can be accessed with this information:
+```
+endpoint: sp.clspvfri0oey.ap-southeast-1.rds.amazonaws.com/sp
+username: sptest
+password: sptestpassword
+```
 
-- CountController.java:
-
-  Shows how to inject a component into a controller and use the component when
-  handling requests.
-
-Components
-==========
-
-- Module.java:
-
-  Shows how to use Guice to bind all the components needed by your application.
-
-- Counter.java:
-
-  An example of a component that contains state, in this case a simple counter.
-
-- ApplicationTimer.java:
-
-  An example of a component that starts when the application starts and stops
-  when the application stops.
-
-Filters
-=======
-
-- Filters.java:
-
-  Creates the list of HTTP filters used by your application.
-
-- ExampleFilter.java
-
-  A simple filter that adds a header to every response.
+### API documentation 
+the api documentation can be found ([here](https://github.com/ErwinLee10/social-media/blob/master/API.md))
